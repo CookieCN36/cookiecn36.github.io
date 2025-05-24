@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>URL加载器</title>
+  <title>URL加载器 + Ping检测</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
     }
-    #container {
+    #container, #ping-container {
       display: flex;
       gap: 10px;
       margin-bottom: 15px;
@@ -28,16 +28,24 @@
       width: 100%;
       height: 500px;
       border: 1px solid #ccc;
+      margin-bottom: 30px;
     }
     iframe {
       width: 100%;
       height: 100%;
       border: none;
-      touch-action: auto; /* 让iframe支持触屏交互 */
+      touch-action: auto;
+    }
+    #ping-result {
+      font-size: 16px;
+      color: #333;
+      min-height: 24px;
     }
   </style>
 </head>
 <body>
+
+  <!-- URL加载部分 -->
   <div id="container">
     <input type="text" id="url-input" placeholder="请输入URL，例如 https://example.com" />
     <button id="load-btn">确认</button>
@@ -47,15 +55,21 @@
     <iframe id="display-frame" src=""></iframe>
   </div>
 
+  <!-- Ping检测部分 -->
+  <div id="ping-container">
+    <input type="text" id="ping-url" placeholder="请输入URL进行Ping检测，比如 https://example.com" />
+    <button id="ping-btn">开始检测</button>
+  </div>
+  <div id="ping-result"></div>
+
   <script>
+    // 加载iframe逻辑
     const input = document.getElementById('url-input');
     const button = document.getElementById('load-btn');
     const iframe = document.getElementById('display-frame');
 
     button.addEventListener('click', () => {
       let url = input.value.trim();
-
-      // 简单校验，自动补全http://前缀
       if (!url) {
         alert('请输入一个有效的URL');
         return;
@@ -63,8 +77,37 @@
       if (!/^https?:\/\//i.test(url)) {
         url = 'http://' + url;
       }
-
       iframe.src = url;
+    });
+
+    // Ping检测逻辑
+    const pingInput = document.getElementById('ping-url');
+    const pingBtn = document.getElementById('ping-btn');
+    const pingResult = document.getElementById('ping-result');
+
+    pingBtn.addEventListener('click', () => {
+      let url = pingInput.value.trim();
+      if (!url) {
+        pingResult.textContent = '请输入URL';
+        return;
+      }
+      if (!/^https?:\/\//i.test(url)) {
+        url = 'http://' + url;
+      }
+
+      pingResult.textContent = '检测中...';
+
+      const startTime = performance.now();
+
+      fetch(url, { method: 'HEAD', mode: 'no-cors' })
+        .then(() => {
+          const endTime = performance.now();
+          const duration = (endTime - startTime).toFixed(2);
+          pingResult.textContent = `Ping成功，响应时间约 ${duration} 毫秒`;
+        })
+        .catch(() => {
+          pingResult.textContent = 'Ping失败，无法连接或请求被阻止';
+        });
     });
   </script>
 </body>
