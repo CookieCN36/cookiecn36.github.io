@@ -1,114 +1,145 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>URL加载器 + Ping检测</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>xddno 的主页</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    #container, #ping-container {
+      font-family: sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 0;
+      color: #111827;
       display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
+      flex-direction: column;
+      align-items: center;
     }
-    input[type="text"] {
-      flex: 1;
-      padding: 8px;
-      font-size: 16px;
+
+    header {
+      margin-top: 40px;
+      text-align: center;
     }
-    button {
-      padding: 8px 16px;
-      font-size: 16px;
-      cursor: pointer;
+
+    .avatar-wrapper {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin: 0 auto;
     }
-    #iframe-container {
-      width: 100%;
-      height: 500px;
-      border: 1px solid #ccc;
-      margin-bottom: 30px;
-    }
-    iframe {
+
+    .avatar {
       width: 100%;
       height: 100%;
-      border: none;
-      touch-action: auto;
+      object-fit: cover;
     }
-    #ping-result {
-      font-size: 16px;
-      color: #333;
-      min-height: 24px;
+
+    h1 {
+      font-size: 1.8rem;
+      margin-top: 16px;
+      font-weight: 600;
+    }
+
+    .intro {
+      margin-top: 24px;
+      max-width: 600px;
+      padding: 0 16px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .socials {
+      margin-top: 24px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .socials a {
+      padding: 8px 16px;
+      background-color: #e5e7eb;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #1f2937;
+      transition: background-color 0.2s;
+    }
+
+    .socials a:hover {
+      background-color: #d1d5db;
+    }
+
+    .message-box {
+      margin-top: 40px;
+      width: 90%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message-box textarea {
+      resize: vertical;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #d1d5db;
+    }
+
+    .message-box button {
+      margin-top: 12px;
+      padding: 10px;
+      border: none;
+      border-radius: 12px;
+      background-color: #4f46e5;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .message-box button:hover {
+      background-color: #4338ca;
     }
   </style>
 </head>
 <body>
+  <header>
+    <p style="font-weight: 500; font-size: 1.2rem;">欢迎来到我的个人主页</p>
+    <div class="avatar-wrapper">
+      <img class="avatar" src="xddno.png" alt="头像">
+    </div>
+    <h1>xddno</h1>
+  </header>
 
-  <!-- URL加载部分 -->
-  <div id="container">
-    <input type="text" id="url-input" placeholder="请输入URL，例如 https://example.com" />
-    <button id="load-btn">确认</button>
+  <div class="intro">
+    <p>我是一名极客，热爱渗透测试、Minecraft PvP、Linux、空战模拟与逆向工程。喜欢动手实践，从指尖感受技术的力量同时我还有点自闭症。</p>
   </div>
 
-  <div id="iframe-container">
-    <iframe id="display-frame" src=""></iframe>
+  <div class="socials">
+    <a href="https://github.com/cookiecn36" target="_blank">GitHub</a>
+    <a href="https://b23.tv/R0l5XfF" target="_blank">Bilibili</a>
   </div>
 
-  <!-- Ping检测部分 -->
-  <div id="ping-container">
-    <input type="text" id="ping-url" placeholder="请输入URL进行Ping检测，比如 https://example.com" />
-    <button id="ping-btn">开始检测</button>
+  <div class="message-box">
+    <label for="msg">给我留言：</label>
+    <textarea id="msg" rows="4" placeholder="你想对我说什么？"></textarea>
+    <button onclick="submitMessage()">发送</button>
   </div>
-  <div id="ping-result"></div>
 
   <script>
-    // 加载iframe逻辑
-    const input = document.getElementById('url-input');
-    const button = document.getElementById('load-btn');
-    const iframe = document.getElementById('display-frame');
+    function sanitize(input) {
+      const div = document.createElement('div');
+      div.textContent = input;
+      return div.innerHTML;
+    }
 
-    button.addEventListener('click', () => {
-      let url = input.value.trim();
-      if (!url) {
-        alert('请输入一个有效的URL');
-        return;
-      }
-      if (!/^https?:\/\//i.test(url)) {
-        url = 'http://' + url;
-      }
-      iframe.src = url;
-    });
-
-    // Ping检测逻辑
-    const pingInput = document.getElementById('ping-url');
-    const pingBtn = document.getElementById('ping-btn');
-    const pingResult = document.getElementById('ping-result');
-
-    pingBtn.addEventListener('click', () => {
-      let url = pingInput.value.trim();
-      if (!url) {
-        pingResult.textContent = '请输入URL';
-        return;
-      }
-      if (!/^https?:\/\//i.test(url)) {
-        url = 'http://' + url;
-      }
-
-      pingResult.textContent = '检测中...';
-
-      const startTime = performance.now();
-
-      fetch(url, { method: 'HEAD', mode: 'no-cors' })
-        .then(() => {
-          const endTime = performance.now();
-          const duration = (endTime - startTime).toFixed(2);
-          pingResult.textContent = `Ping成功，响应时间约 ${duration} 毫秒`;
-        })
-        .catch(() => {
-          pingResult.textContent = 'Ping失败，无法连接或请求被阻止';
-        });
-    });
+    function submitMessage() {
+      const raw = document.getElementById("msg").value;
+      const safe = sanitize(raw);
+      alert("收到你的留言：\\n" + safe);
+      document.getElementById("msg").value = "";
+    }
   </script>
 </body>
 </html>
